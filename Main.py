@@ -36,7 +36,7 @@ if __name__ == "__main__":
     elif sys.argv[1] == "2":
         problem = Problem('cwk_train.csv', 'cwk_test.csv')
         problem.defineProblem()
-        epoch = 1000
+        epoch = 5000
         counter = 0
         best_average_cost = 99999
         start_time = time.time()
@@ -44,7 +44,7 @@ if __name__ == "__main__":
             print("Epoch ", counter)
             gp = GeneticProgrammingOptimisation(problem, None)
             gp_best = gp.optimise()
-            if problem.testProblem(gp_best) < best_avergae_cost:
+            if problem.testProblem(gp_best) < best_average_cost:
                 best_average_cost = problem.testProblem(gp_best)
                 best_solution = gp_best
             counter += 1

@@ -20,25 +20,28 @@ class GeneticProgrammingOptimisation:
                 self.population = self.createNewPopulation()
         except:
             self.population = self.createPSOPopulation()
-        for generation in range(self.num_generations):
+        for _ in range(self.num_generations):
 
             # Measing the fitness of each chromosome in the population.
             fitness = self.calcPopulationFitness()
+            # print("Fitness: ", fitness)
 
             # Selecting the best parents in the population for mating.
             parents = self.selectMatingPool(fitness)
-
+            # print("Parents: ", parents)
             # Generating next generation using crossover.
-            offspring_crossover = self.crossover(parents,
-                                               offspring_size=(self.population_size[0]-parents.shape[0], self.num_weights))
-
+            offspring_crossover = self.crossover(parents, (self.population_size[0]-parents.shape[0], self.num_weights))
+            # print("Offspring Crossover: ", offspring_crossover)
             # Adding some variations to the offsrping using mutation.
             offspring_mutation = self.mutation(offspring_crossover)
-
+            # print("Offspring Mutation: ", offspring_mutation)
             # Creating the new population based on the parents and offspring.
+            # print("Pre mutation parents: ", self.population[0:parents.shape[0], :])
+            # print("Pre mutation mutations: ", self.population[parents.shape[0]:, :])
             self.population[0:parents.shape[0], :] = parents
             self.population[parents.shape[0]:, :] = offspring_mutation
-
+            # print("Post mutation parents: ", self.population[0:parents.shape[0], :])
+            # print("Post mutation mutations: ", self.population[parents.shape[0]:, :])
             # The best result in the current iteration.
             # print("Best result : ", self.calcPopulationFitness())
 
@@ -80,11 +83,10 @@ class GeneticProgrammingOptimisation:
         # Selecting the best individuals in the current generation as parents for producing the offspring of the next generation.
         parents = np.empty((self.num_mating_parents, self.population.shape[1]))
         for parent_num in range(self.num_mating_parents):
-            max_fitness_idx = np.where(fitness == np.min(abs(fitness)))
-
-            max_fitness_idx = max_fitness_idx[0][0]
-            parents[parent_num, :] = self.population[max_fitness_idx, :]
-            fitness[max_fitness_idx] = -99999999999
+            min_fitness_idx = np.where(fitness == np.min(abs(fitness)))
+            min_fitness_idx = min_fitness_idx[0][0]
+            parents[parent_num, :] = self.population[min_fitness_idx, :]
+            fitness[min_fitness_idx] = -99999999
         return parents
 
     def crossover(self, parents, offspring_size):
@@ -107,6 +109,9 @@ class GeneticProgrammingOptimisation:
         # Mutation changes a single gene in each offspring randomly.
         for idx in range(offspring_crossover.shape[0]):
             # The random value to be added to the gene.
+            random_point = random.randint(0, self.num_weights-1)
+            # print("Offspring_crosover:  ->  ", offspring_crossover[idx])
+            # print("4th offspring?:   ->  ", offspring_crossover[idx, 4])
             random_value = np.random.uniform(-1.0, 1.0, 1)
-            offspring_crossover[idx, 4] = offspring_crossover[idx, 4] + random_value
+            offspring_crossover[idx, random_point] = offspring_crossover[idx, random_point] + random_value
         return offspring_crossover

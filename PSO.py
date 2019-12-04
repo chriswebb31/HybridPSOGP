@@ -18,10 +18,10 @@ class ParticleSwarmOptimisation:
 #         new_point = np.random.uniform(low=low, high=high, size=self.problem_size)
         return new_point
 
-    def randomPosition(self, problem):
+    def semiRandomPosition(self, problem):
         new_position = []
         for point in problem:
-            new_position.append(randomPoint(point, point/10))
+            new_position.append(self.randomPoint(point, point/10))
         return new_position
 
     def randomPosition(self):
@@ -31,20 +31,18 @@ class ParticleSwarmOptimisation:
     def initialiseSwarmPostGP(self, best_sol):
         swarm_size = int(20 + math.sqrt(self.problem_size))
         self.swarm = []
-        average = np.average(best_sol)
-        variation = average / 10
-        for i in range(swarm_size):
-            self.swarm.append(Particle(best_sol, self.randomPoint(average, variation)))
+        for _ in range(swarm_size):
+            self.swarm.append(Particle(best_sol, self.semiRandomPosition(best_sol)))
 
     def initialiseSwarmPreGP(self):
         swarm_size = int(20 + math.sqrt(self.problem_size))
         self.swarm = []
-        for i in range(swarm_size):
+        for _ in range(swarm_size):
             self.swarm.append(Particle(self.randomPosition(), self.randomPosition()))
 
     def optimise(self):
         best = 0
-        for i in range(1000):
+        for _ in range(500):
             best = self.globalBest()
             for particle in self.swarm:
                 particle.updateVelocity(best)
